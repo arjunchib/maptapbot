@@ -2,11 +2,17 @@
   "name": "maptapbot",
   "module": "index.ts",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "prettier": "^3.9.9",
+    "prettier-plugin-sql": "^0.20.0",
+    "prettier-plugin-sql-cst": "^0.22.1"
   },
   "peerDependencies": {
     "typescript": "^7"
   },
   "private": true,
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "migrate": "bun run ./db/migrator.ts"
+  }
 }
