@@ -6,6 +6,7 @@
     "module": "Preserve",
     "moduleDetection": "force",
     "jsx": "react-jsx",
+    "jsxImportSource": "mango",
     "allowJs": true,
     "types": ["bun"],
 
@@ -26,5 +27,8 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
+
+    // My stuff
+    // "allowArbitraryExtensions": true // for importing sql
   }
 }

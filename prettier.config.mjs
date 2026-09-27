@@ -6,6 +6,14 @@ import * as prettierPluginSqlCst from "prettier-plugin-sql-cst";
  */
 const config = {
   plugins: [prettierPluginSqlCst],
+  overrides: [
+    {
+      files: ["*.sql"],
+      options: {
+        sqlParamTypes: ["$name"],
+      },
+    },
+  ],
 };
 
 export default config;

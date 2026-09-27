@@ -25,4 +25,5 @@ VALUES
     $score4,
     $score5,
     $total
-  ) ON CONFLICT DO NOTHING;
+  )
+ON CONFLICT DO NOTHING;
