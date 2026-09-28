@@ -1,5 +1,6 @@
 {
   "[sql]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "cSpell.words": ["maptapbot"]
 }

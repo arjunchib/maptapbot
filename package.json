@@ -13,7 +13,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "migrate": "bun run ./db/migrator.ts"
+    "start": "bun ./app/main.ts",
+    "migrate": "bun ./db/migrator.ts",
+    "backup": "bun ./db/cli.ts backup",
+    "restore": "bun ./db/cli.ts restore"
   },
   "dependencies": {
     "discord.js": "^14.27.0"

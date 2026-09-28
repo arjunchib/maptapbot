@@ -1,7 +1,8 @@
-import { Database } from "bun:sqlite";
 import { readdirSync, readFileSync } from "fs";
 import { join } from "path";
 import { db } from "./database";
+import { $ } from "bun";
+import { backup } from "./cli";
 
 // 1. Create a tracking table if it doesn't exist
 db.run(`
@@ -17,6 +18,10 @@ const migrationsDir = join(import.meta.dir, "migrations");
 const files = readdirSync(migrationsDir)
   .filter((f) => f.endsWith(".sql"))
   .sort();
+
+// 2a. Backup
+console.log(`Backing up`);
+await backup();
 
 // 3. Run pending migrations in a transaction
 db.transaction(() => {
@@ -36,3 +41,8 @@ db.transaction(() => {
 })();
 
 console.log("Database is up to date.");
+
+// Update schema
+await $`sqlite3 ./db/maptapbot.sqlite .schema > schema.sql`;
+
+console.log("Saved schema to schema.sql.");
