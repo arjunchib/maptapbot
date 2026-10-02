@@ -1,9 +1,10 @@
+// @jsxImportSource mango
+
 import { db } from "../db/database";
 import { Score } from "../app/models/score";
 import { client } from "../app/client";
 import { DailySummary } from "../app/views/daily_summary";
-import { SnowflakeUtil } from "discord.js";
-import { createScore, readScoreByDay } from "../app/sql";
+import { createScore, getLastScore, readScoreByDay } from "../app/sql";
 import { messageParser } from "../app/message_parser";
 import { environment } from "../app/env";
 
@@ -18,18 +19,20 @@ const sendChannel =
 if (!sendChannel || !sendChannel.isSendable())
   throw new Error("Missing send channel");
 
-const yesterday = Temporal.Now.plainDateISO().subtract({ days: 1 });
+const score = db.query(getLastScore).as(Score).get();
 
-const snowflake = SnowflakeUtil.generate({
-  timestamp: yesterday.toZonedDateTime("UTC").epochMilliseconds,
-});
+if (!score) throw new Error("Could not get the latest score");
 
 const messages = await channel.messages.fetch({
-  after: snowflake.toString(),
+  after: score.message_id,
   limit: 100,
 });
 
+if (messages.size >= 100)
+  throw new Error(`Expected 100 messages but got ${messages.size}`);
+
 const scoresToDb = messages
+  .sort((a, b) => a.createdTimestamp - b.createdTimestamp)
   .map((m) => messageParser.parse(m))
   .filter((m) => m != null);
 
@@ -38,6 +41,8 @@ const insertMany = db.transaction((values) => {
   for (const value of values) insert.run(value);
 });
 insertMany(scoresToDb);
+
+const yesterday = Temporal.Now.plainDateISO().subtract({ days: 1 });
 
 const scoresFromDb = db
   .query(readScoreByDay)

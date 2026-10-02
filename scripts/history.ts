@@ -21,6 +21,7 @@ if (channel.isTextBased()) {
     if (res.size === 0) break;
   }
   const scores = messages
+    .sort((a, b) => a.createdTimestamp - b.createdTimestamp)
     .map((m) => messageParser.parse(m))
     .filter((m) => m != null);
 

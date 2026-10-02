@@ -1,0 +1,1 @@
+SELECT * FROM scores ORDER BY id DESC LIMIT 1;
