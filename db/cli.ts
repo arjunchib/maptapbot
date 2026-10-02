@@ -1,5 +1,5 @@
 import { $ } from "bun";
-import { readdir, rm } from "node:fs/promises";
+import { mkdir, readdir, rm } from "node:fs/promises";
 import { basename } from "node:path";
 import { styleText } from "node:util";
 
@@ -17,6 +17,7 @@ restore <path> - Restore a backup file or most recent backup if omitted.`);
 }
 
 export async function backup() {
+  await mkdir("./db/backups", { recursive: true });
   const file = timestamp();
   await $`sqlite3 maptapbot.sqlite ".backup './db/backups/${file}.sqlite.bak'"`;
 
