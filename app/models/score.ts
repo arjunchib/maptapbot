@@ -9,7 +9,7 @@ export class Score {
   score3!: number;
   score4!: number;
   score5!: number;
-  total!: number;
+  final_score!: number;
 
   // constructor(properties: any) {
   //   Object.assign(this, properties);

@@ -10,8 +10,8 @@ export class DailySummary {
       day: "numeric",
     }).format(this.props.date);
     const leaderboard = this.props.scores
-      .sort((a, b) => b.total - a.total)
-      .map((s, i) => `${i + 1}. <@${s.author_id}> ${s.total}`)
+      .sort((a, b) => b.final_score - a.final_score)
+      .map((s, i) => `${i + 1}. <@${s.author_id}> ${s.final_score}`)
       .join("\n");
     return (
       <Message allowedMentions={{ parse: [] }}>

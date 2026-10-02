@@ -10,7 +10,7 @@ INSERT INTO scores
     score3,
     score4,
     score5,
-    total
+    final_score
   )
 VALUES
   (
@@ -24,6 +24,6 @@ VALUES
     $score3,
     $score4,
     $score5,
-    $total
+    $final_score
   )
 ON CONFLICT DO NOTHING;
