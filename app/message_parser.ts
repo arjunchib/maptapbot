@@ -6,8 +6,8 @@ export class MessageParser {
     const matches = content.match(
       /www\.maptap\.gg (.*) (\d+)\n(.*)\nFinal score: (\d*)/,
     );
-    const [_, monthStr, dayStr, scoresStr, totalStr] = matches || [];
-    if (!monthStr || !dayStr || !scoresStr || !totalStr) return null;
+    const [_, monthStr, dayStr, scoresStr, finalScoreStr] = matches || [];
+    if (!monthStr || !dayStr || !scoresStr || !finalScoreStr) return null;
 
     // date
     const monthDay = Temporal.PlainMonthDay.from({
@@ -33,7 +33,7 @@ export class MessageParser {
       return null;
 
     // total
-    const total = Number(totalStr);
+    const final_score = Number(finalScoreStr);
 
     return {
       played_at,
@@ -42,7 +42,7 @@ export class MessageParser {
       score3,
       score4,
       score5,
-      total,
+      final_score,
       author_id: message.author.id,
       message_id: message.id,
       message_text: message.content,
