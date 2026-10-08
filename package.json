@@ -19,6 +19,8 @@
     "restore": "bun ./db/cli.ts restore"
   },
   "dependencies": {
-    "discord.js": "^14.27.0"
+    "canvas": "^3.2.3",
+    "discord.js": "^14.27.0",
+    "echarts": "^6.1.0"
   }
 }

@@ -1,5 +1,13 @@
-import { Container, Message, TextDisplay } from "mango";
+import {
+  Container,
+  MediaGallery,
+  MediaGalleryItem,
+  Message,
+  TextDisplay,
+} from "mango";
 import type { Score } from "../models/score";
+import { AttachmentBuilder } from "discord.js";
+import { buildChart } from "../lib/build_chart";
 
 export class DailySummary {
   constructor(private props: { scores: Score[]; date: Temporal.PlainDate }) {}
@@ -13,14 +21,21 @@ export class DailySummary {
       .sort((a, b) => b.final_score - a.final_score)
       .map((s, i) => `${i + 1}. <@${s.author_id}> ${s.final_score}`)
       .join("\n");
+    const filename = `chart-${this.props.date}.png`;
+    const ab = new AttachmentBuilder(buildChart(), { name: filename });
     return (
-      <Message allowedMentions={{ parse: [] }}>
+      <Message allowedMentions={{ parse: [] }} files={[ab]}>
         <Container>
           <TextDisplay>
             # {formattedDate} Summary
             {"\n"}
             {leaderboard}
           </TextDisplay>
+          <MediaGallery>
+            <MediaGalleryItem
+              media={{ url: `attachment://${filename}` }}
+            ></MediaGalleryItem>
+          </MediaGallery>
         </Container>
       </Message>
     );
