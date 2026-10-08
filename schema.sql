@@ -17,5 +17,5 @@ CREATE TABLE scores (
   score4 INTEGER NOT NULL,
   score5 INTEGER NOT NULL,
   final_score INTEGER NOT NULL
-);
+, rank INTEGER);
 CREATE UNIQUE INDEX idx_scores_played_at ON scores (played_at, author_id);

@@ -10,8 +10,5 @@ export class Score {
   score4!: number;
   score5!: number;
   final_score!: number;
-
-  // constructor(properties: any) {
-  //   Object.assign(this, properties);
-  // }
+  rank?: number;
 }
