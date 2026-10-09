@@ -6,8 +6,14 @@ import {
   TextDisplay,
 } from "mango";
 import type { Score } from "../models/score";
-import { AttachmentBuilder } from "discord.js";
+import { AttachmentBuilder, codeBlock } from "discord.js";
 import { buildChart } from "../lib/build_chart";
+import { dbReadonly } from "../../db/database";
+import { getAvgScoresByDay } from "../sql";
+
+class AvgScores {
+  [key: string]: number;
+}
 
 export class DailySummary {
   constructor(private props: { scores: Score[]; date: Temporal.PlainDate }) {}
@@ -17,6 +23,12 @@ export class DailySummary {
       month: "short",
       day: "numeric",
     }).format(this.props.date);
+
+    const avgScores = dbReadonly.query(getAvgScoresByDay).as(AvgScores).get();
+    const avgScoresCopy = Object.entries(avgScores || {})
+      .map(([label, value]) => `${label} ${value.toFixed(1)}`)
+      .join(" ");
+
     const leaderboard = this.props.scores
       .sort((a, b) => b.final_score - a.final_score)
       .map(
@@ -24,16 +36,21 @@ export class DailySummary {
           `${i + 1}. ${s.final_score} • ${s.gold} • ${s.silver} • ${s.bronze} • <@${s.author_id}>`,
       )
       .join("\n");
+
     const filename = `chart-${this.props.date}.png`;
     const ab = new AttachmentBuilder(buildChart(), { name: filename });
+
+    const copy = `# ${formattedDate} Results
+### Averages
+${avgScoresCopy}
+            
+### Scores 🥇🥈🥉
+${leaderboard}`;
+
     return (
       <Message allowedMentions={{ parse: [] }} files={[ab]}>
         <Container>
-          <TextDisplay>
-            # {formattedDate} Results 🥇🥈🥉
-            {"\n"}
-            {leaderboard}
-          </TextDisplay>
+          <TextDisplay>{copy}</TextDisplay>
           <MediaGallery>
             <MediaGalleryItem
               media={{ url: `attachment://${filename}` }}
