@@ -1,9 +1,11 @@
-import * as sql from "../app/sql";
-import { dbReadonly } from "../db/database";
+import { db } from "../db/database";
 
 const args = Bun.argv.slice(2);
 
-const query = args.at(0);
-if (!query) throw new Error("Missing query");
+const name = args.at(0);
+if (!name) throw new Error("Missing query name");
 
-console.log(dbReadonly.query(sql[query as keyof typeof sql]).all());
+const file = Bun.file(`./app/sql/${name}.sql`);
+const query = await file.text();
+
+console.log(db.query(query).all());
