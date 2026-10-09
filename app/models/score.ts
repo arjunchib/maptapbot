@@ -11,4 +11,7 @@ export class Score {
   score5!: number;
   final_score!: number;
   rank?: number;
+  gold?: number;
+  silver?: number;
+  bronze?: number;
 }

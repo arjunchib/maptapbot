@@ -1,6 +1,6 @@
 import { client } from "../client";
 import { db } from "../../db/database";
-import { messageParser } from "../message_parser";
+import { messageParser } from "../lib/message_parser";
 import createScore from "../sql/create_score.sql" with { type: "text" };
 
 client.on("messageCreate", async (message) => {

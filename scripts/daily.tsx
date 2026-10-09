@@ -4,12 +4,13 @@ import { db } from "../db/database";
 import { Score } from "../app/models/score";
 import { client } from "../app/client";
 import { DailySummary } from "../app/views/daily_summary";
-import { readScoreByDay } from "../app/sql";
+import { getScoreByDay, updateRank } from "../app/sql";
 import { environment } from "../app/env";
-import { backfillMessages, backfillRanks } from "../app/helpers";
+import { backfillMessages } from "../app/lib/backfill_messages";
 
 await backfillMessages(client);
-backfillRanks();
+
+db.run(updateRank);
 
 const sendChannel = await client.channels.fetch(environment.send_channel_id);
 
@@ -19,7 +20,7 @@ if (!sendChannel || !sendChannel.isSendable())
 const yesterday = Temporal.Now.plainDateISO().subtract({ days: 1 });
 
 const scoresFromDb = db
-  .query(readScoreByDay)
+  .query(getScoreByDay)
   .as(Score)
   .all({ played_at: yesterday.toString() });
 

@@ -19,7 +19,10 @@ export class DailySummary {
     }).format(this.props.date);
     const leaderboard = this.props.scores
       .sort((a, b) => b.final_score - a.final_score)
-      .map((s, i) => `${i + 1}. <@${s.author_id}> ${s.final_score}`)
+      .map(
+        (s, i) =>
+          `${i + 1}. ${s.final_score} • ${s.gold} • ${s.silver} • ${s.bronze} • <@${s.author_id}>`,
+      )
       .join("\n");
     const filename = `chart-${this.props.date}.png`;
     const ab = new AttachmentBuilder(buildChart(), { name: filename });
@@ -27,7 +30,7 @@ export class DailySummary {
       <Message allowedMentions={{ parse: [] }} files={[ab]}>
         <Container>
           <TextDisplay>
-            # {formattedDate} Summary
+            # {formattedDate} Results 🥇🥈🥉
             {"\n"}
             {leaderboard}
           </TextDisplay>
