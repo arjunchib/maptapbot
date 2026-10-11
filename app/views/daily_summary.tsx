@@ -3,7 +3,9 @@ import {
   MediaGallery,
   MediaGalleryItem,
   Message,
+  Section,
   TextDisplay,
+  Thumbnail,
 } from "mango";
 import type { Score } from "../models/score";
 import { AttachmentBuilder, codeBlock } from "discord.js";
@@ -40,22 +42,30 @@ export class DailySummary {
     const filename = `chart-${this.props.date}.png`;
     const ab = new AttachmentBuilder(buildChart(), { name: filename });
 
-    const copy = `# ${formattedDate} Results
-### Averages
-${avgScoresCopy}
-            
+    const copy = `# ${formattedDate}
 ### Scores 🥇🥈🥉
-${leaderboard}`;
+${leaderboard}
+### Average
+${avgScoresCopy}
+`;
 
     return (
       <Message allowedMentions={{ parse: [] }} files={[ab]}>
         <Container>
-          <TextDisplay>{copy}</TextDisplay>
-          <MediaGallery>
+          <Section
+            accessory={
+              <Thumbnail
+                media={{ url: `attachment://${filename}` }}
+              ></Thumbnail>
+            }
+          >
+            <TextDisplay>{copy}</TextDisplay>
+          </Section>
+          {/* <MediaGallery>
             <MediaGalleryItem
               media={{ url: `attachment://${filename}` }}
             ></MediaGalleryItem>
-          </MediaGallery>
+          </MediaGallery> */}
         </Container>
       </Message>
     );
