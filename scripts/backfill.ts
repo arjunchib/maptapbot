@@ -1,6 +1,10 @@
 import { client } from "../app/client";
-import { backfillRanks, backfillMessages } from "../app/helpers";
+import { backfillMessages } from "../app/lib/backfill_messages";
+import { updateRank } from "../app/sql";
+import { db } from "../db/database";
 
 await backfillMessages(client);
-backfillRanks();
+
+db.run(updateRank);
+
 await client.destroy();

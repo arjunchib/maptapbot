@@ -33,5 +33,5 @@ FROM
     GROUP BY author_id, rank
   ) AS r
     ON s.author_id = r.author_id
-WHERE (s.played_at = "2026-10-07")
+WHERE (s.played_at = $played_at)
 GROUP BY s.author_id;

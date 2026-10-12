@@ -1,24 +1,16 @@
-import {
-  Container,
-  MediaGallery,
-  MediaGalleryItem,
-  Message,
-  Section,
-  TextDisplay,
-  Thumbnail,
-} from "mango";
-import type { Score } from "../models/score";
-import { AttachmentBuilder, codeBlock } from "discord.js";
+import { Container, Message, Section, TextDisplay, Thumbnail } from "mango";
+import { Score } from "../models/score";
+import { AttachmentBuilder } from "discord.js";
 import { buildChart } from "../lib/build_chart";
 import { dbReadonly } from "../../db/database";
-import { getAvgScoresByDay } from "../sql";
+import { getAvgScoresByDay, getScoreByDay } from "../sql";
 
 class AvgScores {
   [key: string]: number;
 }
 
 export class DailySummary {
-  constructor(private props: { scores: Score[]; date: Temporal.PlainDate }) {}
+  constructor(private props: { date: Temporal.PlainDate }) {}
 
   render() {
     const formattedDate = new Intl.DateTimeFormat("en-US", {
@@ -26,12 +18,20 @@ export class DailySummary {
       day: "numeric",
     }).format(this.props.date);
 
-    const avgScores = dbReadonly.query(getAvgScoresByDay).as(AvgScores).get();
+    const avgScores = dbReadonly
+      .query(getAvgScoresByDay)
+      .as(AvgScores)
+      .get({ played_at: this.props.date.toString() });
     const avgScoresCopy = Object.entries(avgScores || {})
       .map(([label, value]) => `${label} ${value.toFixed(1)}`)
       .join(" ");
 
-    const leaderboard = this.props.scores
+    const scores = dbReadonly
+      .query(getScoreByDay)
+      .as(Score)
+      .all({ played_at: this.props.date.toString() });
+
+    const leaderboard = scores
       .sort((a, b) => b.final_score - a.final_score)
       .map(
         (s, i) =>
