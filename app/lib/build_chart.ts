@@ -25,7 +25,7 @@ export function buildChart(scores: Score[]) {
     },
     yAxis: {
       type: "value",
-      name: "Scores",
+      name: "Points",
       nameLocation: "middle",
       max: 300,
       min: 0,
