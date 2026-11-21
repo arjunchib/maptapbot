@@ -59,7 +59,7 @@ export class DailySummary {
         (s, i) =>
           `${i + 1}. ${inlineCode(s.final_score.toString())} ${inlineCode(
             this.dateFormatter2.format(s.playedAt),
-          )} <@${s.author_id}>`,
+          )} <@${s.author_id}>${s.playedAt.equals(this.props.date) ? " 🆕" : ""}`,
       )
       .join("\n");
   }
