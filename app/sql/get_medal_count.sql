@@ -1,9 +1,9 @@
 SELECT
-  s.*,
+  author_id,
   COALESCE(
     MAX(
       CASE
-        WHEN r.rank = 1 THEN r.total
+        WHEN rank = 1 THEN total
       END
     ),
     0
@@ -11,7 +11,7 @@ SELECT
   COALESCE(
     MAX(
       CASE
-        WHEN r.rank = 2 THEN r.total
+        WHEN rank = 2 THEN total
       END
     ),
     0
@@ -19,19 +19,17 @@ SELECT
   COALESCE(
     MAX(
       CASE
-        WHEN r.rank = 3 THEN r.total
+        WHEN rank = 3 THEN total
       END
     ),
     0
   ) AS bronze
 FROM
-  scores AS s
-  JOIN (
+  (
     SELECT author_id, rank, count(*) AS total
     FROM scores
     WHERE rank IN (1, 2, 3)
     GROUP BY author_id, rank
-  ) AS r
-    ON s.author_id = r.author_id
-WHERE (s.played_at = $played_at)
-GROUP BY s.author_id;
+  )
+GROUP BY author_id
+ORDER BY gold DESC, silver DESC, bronze DESC;

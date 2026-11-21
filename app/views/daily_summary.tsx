@@ -1,53 +1,96 @@
 import { Container, Message, Section, TextDisplay, Thumbnail } from "mango";
 import { Score } from "../models/score";
-import { AttachmentBuilder } from "discord.js";
+import { AttachmentBuilder, inlineCode, time } from "discord.js";
 import { buildChart } from "../lib/build_chart";
 import { dbReadonly } from "../../db/database";
-import { getAvgScoresByDay, getScoreByDay } from "../sql";
+import {
+  getAvgScoresByDay,
+  getLeaderboard,
+  getMedalCount,
+  getScoresByDay,
+} from "../sql";
 
-class AvgScores {
-  [key: string]: number;
+class MedalCountEntry {
+  author_id!: string;
+  gold!: number;
+  silver!: number;
+  bronze!: number;
 }
 
 export class DailySummary {
+  private dateFormatter = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+
+  private dateFormatter2 = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+
   constructor(private props: { date: Temporal.PlainDate }) {}
 
-  render() {
-    const formattedDate = new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-    }).format(this.props.date);
+  private formattedDate() {
+    return this.dateFormatter.format(this.props.date);
+  }
 
-    const avgScores = dbReadonly
-      .query(getAvgScoresByDay)
-      .as(AvgScores)
-      .get({ played_at: this.props.date.toString() });
-    const avgScoresCopy = Object.entries(avgScores || {})
-      .map(([label, value]) => `${label} ${value.toFixed(1)}`)
-      .join(" ");
+  private formatMedal(count: number) {
+    return inlineCode(count.toString().padStart(2));
+  }
 
-    const scores = dbReadonly
-      .query(getScoreByDay)
+  private scores() {
+    return dbReadonly
+      .query(getScoresByDay)
       .as(Score)
-      .all({ played_at: this.props.date.toString() });
-
-    const leaderboard = scores
-      .sort((a, b) => b.final_score - a.final_score)
+      .all({ played_at: this.props.date.toString() })
       .map(
         (s, i) =>
-          `${i + 1}. ${s.final_score} • ${s.gold} • ${s.silver} • ${s.bronze} • <@${s.author_id}>`,
+          `${i + 1}. ${inlineCode(s.final_score.toString())} <@${s.author_id}>`,
       )
       .join("\n");
+  }
 
+  private leaderboard() {
+    return dbReadonly
+      .query(getLeaderboard)
+      .as(Score)
+      .all()
+      .map(
+        (s, i) =>
+          `${i + 1}. ${inlineCode(s.final_score.toString())} ${inlineCode(
+            this.dateFormatter2.format(s.playedAt),
+          )} <@${s.author_id}>`,
+      )
+      .join("\n");
+  }
+
+  private medalCount() {
+    return dbReadonly
+      .query(getMedalCount)
+      .as(MedalCountEntry)
+      .all()
+      .map(
+        (s, i) =>
+          `${i + 1}. 🥇${this.formatMedal(s.gold)} 🥈${this.formatMedal(s.silver)} 🥉${this.formatMedal(s.bronze)} <@${s.author_id}>`,
+      )
+      .join("\n");
+  }
+
+  private copy() {
+    return `# ${this.formattedDate()}
+### Scores
+${this.scores()}
+### Medal Count
+${this.medalCount()}
+### Leaderboard
+${this.leaderboard()}
+`;
+  }
+
+  render() {
     const filename = `chart-${this.props.date}.png`;
     const ab = new AttachmentBuilder(buildChart(), { name: filename });
-
-    const copy = `# ${formattedDate}
-### Scores 🥇🥈🥉
-${leaderboard}
-### Average
-${avgScoresCopy}
-`;
 
     return (
       <Message allowedMentions={{ parse: [] }} files={[ab]}>
@@ -59,13 +102,8 @@ ${avgScoresCopy}
               ></Thumbnail>
             }
           >
-            <TextDisplay>{copy}</TextDisplay>
+            <TextDisplay>{this.copy()}</TextDisplay>
           </Section>
-          {/* <MediaGallery>
-            <MediaGalleryItem
-              media={{ url: `attachment://${filename}` }}
-            ></MediaGalleryItem>
-          </MediaGallery> */}
         </Container>
       </Message>
     );
