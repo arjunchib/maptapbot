@@ -6,6 +6,7 @@ import getDailyAverages from "./sql/get_daily_averages.sql" with { type: "text" 
 import getAvgScoresByDay from "./sql/get_avg_scores_by_day.sql" with { type: "text" };
 import getLeaderboard from "./sql/get_leaderboard.sql" with { type: "text" };
 import getMedalCount from "./sql/get_medal_count.sql" with { type: "text" };
+import getAllScores from "./sql/get_all_scores.sql" with { type: "text" };
 
 export {
   createScore,
@@ -16,4 +17,5 @@ export {
   getAvgScoresByDay,
   getLeaderboard,
   getMedalCount,
+  getAllScores,
 };

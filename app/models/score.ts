@@ -10,7 +10,7 @@ export class Score {
   score4!: number;
   score5!: number;
   final_score!: number;
-  rank?: number;
+  rank!: number;
 
   get playedAt() {
     return Temporal.PlainDate.from(this.played_at);

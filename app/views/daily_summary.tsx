@@ -3,12 +3,7 @@ import { Score } from "../models/score";
 import { AttachmentBuilder, inlineCode, time } from "discord.js";
 import { buildChart } from "../lib/build_chart";
 import { dbReadonly } from "../../db/database";
-import {
-  getAvgScoresByDay,
-  getLeaderboard,
-  getMedalCount,
-  getScoresByDay,
-} from "../sql";
+import { getLeaderboard, getMedalCount, getScoresByDay } from "../sql";
 
 class MedalCountEntry {
   author_id!: string;
@@ -29,7 +24,14 @@ export class DailySummary {
     year: "numeric",
   });
 
-  constructor(private props: { date: Temporal.PlainDate }) {}
+  private scores: Score[];
+
+  constructor(private props: { date: Temporal.PlainDate }) {
+    this.scores = dbReadonly
+      .query(getScoresByDay)
+      .as(Score)
+      .all({ played_at: this.props.date.toString() });
+  }
 
   private formattedDate() {
     return this.dateFormatter.format(this.props.date);
@@ -39,11 +41,8 @@ export class DailySummary {
     return inlineCode(count.toString().padStart(2));
   }
 
-  private scores() {
-    return dbReadonly
-      .query(getScoresByDay)
-      .as(Score)
-      .all({ played_at: this.props.date.toString() })
+  private dailyScores() {
+    return this.scores
       .map(
         (s, i) =>
           `${i + 1}. ${inlineCode(s.final_score.toString())} <@${s.author_id}>`,
@@ -79,8 +78,8 @@ export class DailySummary {
 
   private copy() {
     return `# ${this.formattedDate()}
-### Scores
-${this.scores()}
+### Daily Scores
+${this.dailyScores()}
 ### Medal Count
 ${this.medalCount()}
 ### Leaderboard
@@ -90,7 +89,9 @@ ${this.leaderboard()}
 
   render() {
     const filename = `chart-${this.props.date}.png`;
-    const ab = new AttachmentBuilder(buildChart(), { name: filename });
+    const ab = new AttachmentBuilder(buildChart(this.scores), {
+      name: filename,
+    });
 
     return (
       <Message allowedMentions={{ parse: [] }} files={[ab]}>
