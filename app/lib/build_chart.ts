@@ -1,8 +1,7 @@
 import * as echarts from "echarts";
 import { Score } from "../models/score";
-import { Image as CanvasImage, createCanvas } from "@napi-rs/canvas";
-import { Resvg } from "@resvg/resvg-js";
 import type { SeriesOption } from "echarts";
+import { createCanvas } from "canvas";
 
 export function buildChart(scores: Score[]) {
   const canvas = createCanvas(400, 300);
