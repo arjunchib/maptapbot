@@ -19,7 +19,6 @@ export function buildChart(scores: Score[]) {
     },
     xAxis: {
       type: "category",
-      jitter: 50,
       data: range.map((r) => `City ${r}`),
     },
     yAxis: {
@@ -62,6 +61,11 @@ export function buildChart(scores: Score[]) {
           //   }
           // },
           symbolSize: 12,
+          symbolOffset: () => {
+            const width = 50;
+            const spacing = width / scores.length;
+            return [(s.rank - 1) * spacing - (scores.length * spacing) / 2, 0];
+          },
           itemStyle: {
             opacity: 0.9,
             color: (params) =>
