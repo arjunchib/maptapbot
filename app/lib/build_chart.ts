@@ -29,7 +29,7 @@ export function buildChart(scores: Score[]) {
       max: 300,
       min: 0,
     },
-    series: scores.reverse().map(
+    series: scores.map(
       (s) =>
         ({
           name: s.author_id,
